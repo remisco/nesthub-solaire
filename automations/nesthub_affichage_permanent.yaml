@@ -1,0 +1,25 @@
+# Affiche la vue « Solaire » en permanence sur le Nest Hub.
+# Toutes les minutes : si l'écran est au repos (cadre photo, horloge, éteint) et n'affiche pas
+# déjà Home Assistant, la vue est relancée. Une vidéo YouTube ou une autre appli n'est jamais interrompue.
+# Remplacez media_player.nest_hub par l'entité de votre écran.
+alias: Nest Hub - affichage solaire permanent
+mode: single
+triggers:
+  - trigger: time_pattern
+    minutes: /1
+conditions:
+  # A078F6B0 = application « Home Assistant Cast » déjà à l'écran
+  - condition: template
+    value_template: '{{ state_attr("media_player.nest_hub", "app_id") != "A078F6B0" }}'
+  - condition: state
+    entity_id: media_player.nest_hub
+    state:
+      - "off"
+      - idle
+      - unavailable
+actions:
+  - action: cast.show_lovelace_view
+    data:
+      entity_id: media_player.nest_hub
+      dashboard_path: lovelace
+      view_path: solaire

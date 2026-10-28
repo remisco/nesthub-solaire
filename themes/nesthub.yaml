@@ -1,0 +1,11 @@
+# Thème clair sans marges pour la vue Nest Hub (config/themes/nesthub.yaml)
+Nest Hub clair:
+  primary-background-color: "#F3F4F6"
+  lovelace-background: "#F3F4F6"
+  card-background-color: "#FFFFFF"
+  primary-text-color: "#1F2937"
+  secondary-text-color: "#4B5563"
+  ha-card-border-radius: "0px"
+  ha-card-box-shadow: "none"
+  app-header-background-color: "#F3F4F6"
+  app-header-text-color: "#1F2937"

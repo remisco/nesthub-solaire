@@ -1,0 +1,819 @@
+# Vue « Solaire » pour Google Nest Hub — picture-elements + calques animés button-card
+# Remplacez les entités sensor.* par les vôtres (voir README, section « Adapter les capteurs »).
+title: Solaire
+path: solaire
+type: panel
+theme: Nest Hub clair
+cards:
+- type: picture-elements
+  image: /local/nesthub_fond.png?v=1
+  card_mod:
+    style: |
+      ha-card { border-radius: 0; box-shadow: none; border: none; overflow: hidden; }
+  elements:
+  - type: custom:button-card
+    entity: sensor.solar_power
+    triggers_update:
+    - sensor.solar_power
+    name: anime-panneaux
+    show_name: false
+    show_icon: false
+    show_state: false
+    show_label: false
+    tap_action:
+      action: none
+    hold_action:
+      action: none
+    styles:
+      card:
+      - background: none
+      - box-shadow: none
+      - border: none
+      - padding: '0'
+      - border-radius: '0'
+      - overflow: visible
+      grid:
+      - grid-template-areas: '"a"'
+      - grid-template-columns: 1fr
+      - grid-template-rows: 1fr
+      custom_fields:
+        a:
+        - width: 100%
+        - line-height: '0'
+    extra_styles: |2
+
+      @keyframes reflet{from{transform:translateX(-50px) skewX(-22deg)}to{transform:translateX(150px) skewX(-22deg)}}
+      @keyframes et{0%,70%,100%{opacity:0;transform:scale(.3)}80%{opacity:1;transform:scale(1)}}
+      .reflet{animation:reflet linear infinite;will-change:transform}
+      .et{animation:et 3.2s ease-in-out infinite;opacity:0}
+    custom_fields:
+      a: |
+        [[[ const n=(id)=>{const s=states[id];if(!s)return 0;let v=parseFloat(s.state);if(isNaN(v))return 0;return (s.attributes.unit_of_measurement||'')==='kW'?v*1000:v;};
+        const p=n('sensor.solar_power');
+        const poly='0,0 86,0 86,36 58,89 0,89';
+        if(p<20) return `<svg viewBox="0 0 87 89" width="100%"><polygon points="${poly}" fill="#0b1530" opacity=".4"/></svg>`;
+        const d=Math.max(1.8,6.5-p/700).toFixed(1);
+        const et=[[18,20,0],[52,14,1.3],[34,50,2.1],[66,32,.6],[14,66,1.8]].map(([x,y,t])=>`<path class="et" style="animation-delay:${t}s;transform-origin:${x}px ${y}px" d="M${x} ${y-4}L${x+1} ${y-1}L${x+4} ${y}L${x+1} ${y+1}L${x} ${y+4}L${x-1} ${y+1}L${x-4} ${y}L${x-1} ${y-1}Z" fill="#fff"/>`).join('');
+        return `<svg viewBox="0 0 87 89" width="100%"><defs><clipPath id="cp"><polygon points="${poly}"/></clipPath>
+        <linearGradient id="lg" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".6"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>
+        <g clip-path="url(#cp)"><rect class="reflet" x="0" y="-20" width="26" height="140" fill="url(#lg)" style="animation-duration:${d}s"/>${et}</g></svg>`;
+         ]]]
+    style:
+      left: 6.90%
+      top: 11.74%
+      width: 13.81%
+      pointer-events: none
+  - type: custom:button-card
+    entity: sensor.solar_power
+    triggers_update:
+    - sensor.solar_power
+    name: anime-onduleur
+    show_name: false
+    show_icon: false
+    show_state: false
+    show_label: false
+    tap_action:
+      action: none
+    hold_action:
+      action: none
+    styles:
+      card:
+      - background: none
+      - box-shadow: none
+      - border: none
+      - padding: '0'
+      - border-radius: '0'
+      - overflow: visible
+      grid:
+      - grid-template-areas: '"a"'
+      - grid-template-columns: 1fr
+      - grid-template-rows: 1fr
+      custom_fields:
+        a:
+        - width: 100%
+        - line-height: '0'
+    extra_styles: |2
+
+      @keyframes led{0%,100%{opacity:.3}50%{opacity:1}}
+      .led{animation:led 1.6s ease-in-out infinite}
+    custom_fields:
+      a: |
+        [[[ const n=(id)=>{const s=states[id];if(!s)return 0;let v=parseFloat(s.state);if(isNaN(v))return 0;return (s.attributes.unit_of_measurement||'')==='kW'?v*1000:v;};
+        if(n('sensor.solar_power')<20) return '<svg viewBox="0 0 1 1" width="100%"></svg>';
+        return `<svg viewBox="0 0 20 12" width="100%"><circle cx="10" cy="6" r="5" fill="#22C55E" opacity=".25"/><circle class="led" cx="10" cy="6" r="2.4" fill="#4ADE80"/></svg>`;
+         ]]]
+    style:
+      left: 42.22%
+      top: 13.46%
+      width: 3.17%
+      pointer-events: none
+  - type: custom:button-card
+    entity: sensor.solar_power
+    triggers_update:
+    - sensor.solar_power
+    - sensor.grid_import_power
+    name: anime-flux
+    show_name: false
+    show_icon: false
+    show_state: false
+    show_label: false
+    tap_action:
+      action: none
+    hold_action:
+      action: none
+    styles:
+      card:
+      - background: none
+      - box-shadow: none
+      - border: none
+      - padding: '0'
+      - border-radius: '0'
+      - overflow: visible
+      grid:
+      - grid-template-areas: '"a"'
+      - grid-template-columns: 1fr
+      - grid-template-rows: 1fr
+      custom_fields:
+        a:
+        - width: 100%
+        - line-height: '0'
+    extra_styles: |2
+
+      @keyframes pt{0%{transform:translateX(2px);opacity:0}15%{opacity:1}85%{opacity:1}100%{transform:translateX(38px);opacity:0}}
+      .pt{animation:pt linear infinite;will-change:transform}
+    custom_fields:
+      a: |
+        [[[ const n=(id)=>{const s=states[id];if(!s)return 0;let v=parseFloat(s.state);if(isNaN(v))return 0;return (s.attributes.unit_of_measurement||'')==='kW'?v*1000:v;};
+        const p=n('sensor.solar_power');
+        if(p<20) return '<svg viewBox="0 0 1 1" width="100%"></svg>';
+        const d=Math.max(.8,2.6-p/1500).toFixed(2);
+        let pts='';for(let k=0;k<3;k++){pts+=`<circle class="pt" cx="0" cy="5" r="1.8" fill="#22C55E" style="animation-duration:${d}s;animation-delay:${(k*d/3).toFixed(2)}s"/>`;}
+        return `<svg viewBox="0 0 40 10" width="100%"><line x1="2" y1="5" x2="38" y2="5" stroke="#22C55E" stroke-width=".8" stroke-dasharray="1.5 2.5" opacity=".45"/>${pts}</svg>`;
+         ]]]
+    style:
+      left: 49.52%
+      top: 12.40%
+      width: 6.35%
+      pointer-events: none
+  - type: custom:button-card
+    entity: sensor.house_power
+    triggers_update:
+    - sensor.house_power
+    - sensor.grid_import_power
+    name: anime-cercle
+    show_name: false
+    show_icon: false
+    show_state: false
+    show_label: false
+    tap_action:
+      action: none
+    hold_action:
+      action: none
+    styles:
+      card:
+      - background: none
+      - box-shadow: none
+      - border: none
+      - padding: '0'
+      - border-radius: '0'
+      - overflow: visible
+      grid:
+      - grid-template-areas: '"a"'
+      - grid-template-columns: 1fr
+      - grid-template-rows: 1fr
+      custom_fields:
+        a:
+        - width: 100%
+        - line-height: '0'
+    extra_styles: |2
+
+      @keyframes arc{to{transform:rotate(360deg)}}
+      @keyframes coeur{0%,100%{opacity:0;transform:scale(.7)}50%{opacity:.28;transform:scale(1.15)}}
+      .arc{animation:arc linear infinite;transform-origin:46px 46px;will-change:transform}
+      .coeur{animation:coeur 1.8s ease-in-out infinite;transform-origin:46px 46px}
+    custom_fields:
+      a: |
+        [[[ const n=(id)=>{const s=states[id];if(!s)return 0;let v=parseFloat(s.state);if(isNaN(v))return 0;return (s.attributes.unit_of_measurement||'')==='kW'?v*1000:v;};
+        const c=n('sensor.house_power'), i=n('sensor.grid_import_power');
+        const col=i<50?'#4ADE80':'#FB923C', d=Math.max(1.4,9-c/350).toFixed(1);
+        const arc=(r,da,op,w,dl)=>`<circle class="arc" cx="46" cy="46" r="${r}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round" stroke-dasharray="${da}" opacity="${op}" style="animation-duration:${d}s;animation-delay:-${dl}s"/>`;
+        return `<svg viewBox="0 0 92 92" width="100%">${arc(36,'30 196',.25,7,0)}${arc(36,'30 196',1,2.6,0)}${arc(36,'12 214',.6,2,d/2)}
+        <circle class="coeur" cx="46" cy="46" r="11" fill="${col}"/></svg>`;
+         ]]]
+    style:
+      left: 91.75%
+      top: 12.14%
+      width: 14.60%
+      pointer-events: none
+  - type: custom:button-card
+    entity: sensor.eau_chaude_disponible
+    triggers_update:
+    - sensor.eau_chaude_disponible
+    - sensor.water_heater_temperature
+    name: anime-ballon
+    show_name: false
+    show_icon: false
+    show_state: false
+    show_label: false
+    tap_action:
+      action: none
+    hold_action:
+      action: none
+    styles:
+      card:
+      - background: none
+      - box-shadow: none
+      - border: none
+      - padding: '0'
+      - border-radius: '0'
+      - overflow: visible
+      grid:
+      - grid-template-areas: '"a"'
+      - grid-template-columns: 1fr
+      - grid-template-rows: 1fr
+      custom_fields:
+        a:
+        - width: 100%
+        - line-height: '0'
+    extra_styles: |2
+
+      @keyframes vague{from{transform:translateX(0)}to{transform:translateX(20px)}}
+      @keyframes bulle{0%{transform:translateY(0);opacity:0}15%{opacity:.9}100%{transform:translateY(-44px);opacity:0}}
+      .vague{animation:vague 2.4s linear infinite;will-change:transform}
+      .bulle{animation:bulle 3s ease-in infinite}
+    custom_fields:
+      a: |
+        [[[ const n=(id)=>{const s=states[id];if(!s)return 0;let v=parseFloat(s.state);if(isNaN(v))return 0;return (s.attributes.unit_of_measurement||'')==='kW'?v*1000:v;};
+        const l=Math.min(300,Math.max(0,n('sensor.eau_chaude_disponible'))), t=n('sensor.water_heater_temperature');
+        const col=t>=50?'#EF4444':t>=40?'#F97316':t>=30?'#F59E0B':'#3B82F6';
+        const h=Math.round(62*l/300), y=69-h;
+        const nb=t>=55?5:t>=45?3:t>=35?1:0;
+        let b='';for(let k=0;k<nb;k++){b+=`<circle class="bulle" cx="${9+k*5}" cy="66" r="1.5" fill="#fff" opacity=".9" style="animation-delay:${(k*.6).toFixed(1)}s"/>`;}
+        return `<svg viewBox="0 0 40 72" width="100%"><defs><clipPath id="cb"><rect x="3" y="4" width="30" height="66" rx="9"/></clipPath></defs>
+        <g clip-path="url(#cb)"><g class="vague"><path d="M-40 ${y} q5 -2.5 10 0 t10 0 t10 0 t10 0 t10 0 t10 0 t10 0 t10 0 t10 0 V80 H-40Z" fill="${col}" opacity=".1"/>
+        <path d="M-40 ${y} q5 -2.5 10 0 t10 0 t10 0 t10 0 t10 0 t10 0 t10 0 t10 0 t10 0" fill="none" stroke="${col}" stroke-width="1.6" opacity=".75"/>
+        <path d="M-40 ${y+1.2} q5 -2.5 10 0 t10 0 t10 0 t10 0 t10 0 t10 0 t10 0 t10 0 t10 0" fill="none" stroke="#fff" stroke-width=".8" opacity=".7"/></g>${b}</g></svg>`;
+         ]]]
+    style:
+      left: 42.86%
+      top: 37.20%
+      width: 6.35%
+      pointer-events: none
+  - type: custom:button-card
+    entity: sensor.water_heater_temperature
+    triggers_update:
+    - sensor.water_heater_temperature
+    name: anime-thermo
+    show_name: false
+    show_icon: false
+    show_state: false
+    show_label: false
+    tap_action:
+      action: none
+    hold_action:
+      action: none
+    styles:
+      card:
+      - background: none
+      - box-shadow: none
+      - border: none
+      - padding: '0'
+      - border-radius: '0'
+      - overflow: visible
+      grid:
+      - grid-template-areas: '"a"'
+      - grid-template-columns: 1fr
+      - grid-template-rows: 1fr
+      custom_fields:
+        a:
+        - width: 100%
+        - line-height: '0'
+    extra_styles: |2
+
+      @keyframes halo{0%,100%{opacity:.1;transform:scale(.8)}50%{opacity:.45;transform:scale(1.25)}}
+      .halo{animation:halo 2.4s ease-in-out infinite;transform-origin:10px 10px}
+    custom_fields:
+      a: |
+        [[[ const n=(id)=>{const s=states[id];if(!s)return 0;let v=parseFloat(s.state);if(isNaN(v))return 0;return (s.attributes.unit_of_measurement||'')==='kW'?v*1000:v;};
+        const t=n('sensor.water_heater_temperature'), col=t>=45?'#EF4444':t>=35?'#F59E0B':'#3B82F6';
+        return `<svg viewBox="0 0 20 20" width="100%"><circle class="halo" cx="10" cy="10" r="6" fill="${col}"/></svg>`;
+         ]]]
+    style:
+      left: 45.24%
+      top: 41.16%
+      width: 3.17%
+      pointer-events: none
+  - type: custom:button-card
+    entity: sensor.douches_restantes
+    triggers_update:
+    - sensor.douches_restantes
+    name: anime-douche
+    show_name: false
+    show_icon: false
+    show_state: false
+    show_label: false
+    tap_action:
+      action: none
+    hold_action:
+      action: none
+    styles:
+      card:
+      - background: none
+      - box-shadow: none
+      - border: none
+      - padding: '0'
+      - border-radius: '0'
+      - overflow: visible
+      grid:
+      - grid-template-areas: '"a"'
+      - grid-template-columns: 1fr
+      - grid-template-rows: 1fr
+      custom_fields:
+        a:
+        - width: 100%
+        - line-height: '0'
+    extra_styles: |2
+
+      @keyframes goutte{0%{transform:translateY(0);opacity:0}10%{opacity:1}100%{transform:translateY(17px);opacity:0}}
+      .goutte{animation:goutte 1.2s ease-in infinite}
+    custom_fields:
+      a: |
+        [[[ const n=(id)=>{const s=states[id];if(!s)return 0;let v=parseFloat(s.state);if(isNaN(v))return 0;return (s.attributes.unit_of_measurement||'')==='kW'?v*1000:v;};
+        const nb=Math.min(6,Math.max(0,Math.round(n('sensor.douches_restantes'))));
+        let g='';for(let k=0;k<nb;k++){g+=`<path class="goutte" d="M${5+k*2.6} 0 q1.6 2.4 1.6 3.4 a1.6 1.6 0 0 1 -3.2 0 q0 -1 1.6 -3.4Z" fill="#0EA5E9" stroke="#fff" stroke-width=".4" style="animation-delay:${(k*.21).toFixed(2)}s"/>`;}
+        return `<svg viewBox="0 0 24 22" width="100%">${g}</svg>`;
+         ]]]
+    style:
+      left: 52.38%
+      top: 40.11%
+      width: 3.81%
+      pointer-events: none
+  - type: custom:button-card
+    entity: sensor.rte_tempo_couleur_actuelle
+    triggers_update:
+    - sensor.rte_tempo_couleur_actuelle
+    name: anime-tempo1
+    show_name: false
+    show_icon: false
+    show_state: false
+    show_label: false
+    tap_action:
+      action: none
+    hold_action:
+      action: none
+    styles:
+      card:
+      - background: none
+      - box-shadow: none
+      - border: none
+      - padding: '0'
+      - border-radius: '0'
+      - overflow: visible
+      grid:
+      - grid-template-areas: '"a"'
+      - grid-template-columns: 1fr
+      - grid-template-rows: 1fr
+      custom_fields:
+        a:
+        - width: 100%
+        - line-height: '0'
+    extra_styles: |2
+
+      @keyframes respire{0%,100%{opacity:0}50%{opacity:.9}}
+      .cal{position:relative;width:100%;aspect-ratio:1;border-radius:16%}
+      .cal::after{content:"";position:absolute;inset:-3px;border-radius:18%;box-shadow:0 0 12px 3px var(--g);animation:respire 3.5s ease-in-out infinite;will-change:opacity}
+    custom_fields:
+      a: |
+        [[[ const n=(id)=>{const s=states[id];if(!s)return 0;let v=parseFloat(s.state);if(isNaN(v))return 0;return (s.attributes.unit_of_measurement||'')==='kW'?v*1000:v;};
+        const s=(states['sensor.rte_tempo_couleur_actuelle']||{}).state||'';
+        const f=s==='Rouge'?'hue-rotate(136deg) saturate(4.5) brightness(.92)':s==='Blanc'?'grayscale(1) brightness(1.08)':'saturate(1.6)';
+        const g=s==='Rouge'?'#DC2626':s==='Blanc'?'#9CA3AF':s==='Bleu'?'#2563EB':'transparent';
+        return `<div class="cal" style="backdrop-filter:${f};-webkit-backdrop-filter:${f};--g:${g}"></div>`;
+         ]]]
+    style:
+      left: 42.54%
+      top: 62.27%
+      width: 8.57%
+      pointer-events: none
+  - type: custom:button-card
+    entity: sensor.rte_tempo_prochaine_couleur
+    triggers_update:
+    - sensor.rte_tempo_prochaine_couleur
+    name: anime-tempo2
+    show_name: false
+    show_icon: false
+    show_state: false
+    show_label: false
+    tap_action:
+      action: none
+    hold_action:
+      action: none
+    styles:
+      card:
+      - background: none
+      - box-shadow: none
+      - border: none
+      - padding: '0'
+      - border-radius: '0'
+      - overflow: visible
+      grid:
+      - grid-template-areas: '"a"'
+      - grid-template-columns: 1fr
+      - grid-template-rows: 1fr
+      custom_fields:
+        a:
+        - width: 100%
+        - line-height: '0'
+    extra_styles: |2
+
+      @keyframes respire{0%,100%{opacity:0}50%{opacity:.9}}
+      .cal{position:relative;width:100%;aspect-ratio:1;border-radius:16%}
+      .cal::after{content:"";position:absolute;inset:-3px;border-radius:18%;box-shadow:0 0 12px 3px var(--g);animation:respire 3.5s ease-in-out infinite;will-change:opacity}
+    custom_fields:
+      a: |
+        [[[ const n=(id)=>{const s=states[id];if(!s)return 0;let v=parseFloat(s.state);if(isNaN(v))return 0;return (s.attributes.unit_of_measurement||'')==='kW'?v*1000:v;};
+        const s=(states['sensor.rte_tempo_prochaine_couleur']||{}).state||'';
+        const f=s==='Rouge'?'hue-rotate(136deg) saturate(4.5) brightness(.92)':s==='Blanc'?'grayscale(1) brightness(1.08)':'saturate(1.6)';
+        const g=s==='Rouge'?'#DC2626':s==='Blanc'?'#9CA3AF':s==='Bleu'?'#2563EB':'transparent';
+        return `<div class="cal" style="backdrop-filter:${f};-webkit-backdrop-filter:${f};--g:${g}"></div>`;
+         ]]]
+    style:
+      left: 92.54%
+      top: 62.27%
+      width: 8.57%
+      pointer-events: none
+  - type: custom:button-card
+    entity: sensor.solar_power
+    triggers_update:
+    - sensor.solar_power
+    name: anime-soleil
+    show_name: false
+    show_icon: false
+    show_state: false
+    show_label: false
+    tap_action:
+      action: none
+    hold_action:
+      action: none
+    styles:
+      card:
+      - background: none
+      - box-shadow: none
+      - border: none
+      - padding: '0'
+      - border-radius: '0'
+      - overflow: visible
+      grid:
+      - grid-template-areas: '"a"'
+      - grid-template-columns: 1fr
+      - grid-template-rows: 1fr
+      custom_fields:
+        a:
+        - width: 100%
+        - line-height: '0'
+    extra_styles: |2
+
+      @keyframes rayons{to{transform:rotate(360deg)}}
+      @keyframes coeur{0%,100%{opacity:.1;transform:scale(1)}50%{opacity:.4;transform:scale(1.35)}}
+      .rayons{animation:rayons 14s linear infinite;transform-origin:20px 20px;will-change:transform}
+      .coeur{animation:coeur 3s ease-in-out infinite;transform-origin:20px 20px}
+    custom_fields:
+      a: |
+        [[[ const n=(id)=>{const s=states[id];if(!s)return 0;let v=parseFloat(s.state);if(isNaN(v))return 0;return (s.attributes.unit_of_measurement||'')==='kW'?v*1000:v;};
+        const p=n('sensor.solar_power');
+        if(p<20) return '<svg viewBox="0 0 1 1" width="100%"></svg>';
+        let r='';for(let k=0;k<8;k++){const a=k*Math.PI/4;r+=`<line x1="${(20+12*Math.cos(a)).toFixed(1)}" y1="${(20+12*Math.sin(a)).toFixed(1)}" x2="${(20+17*Math.cos(a)).toFixed(1)}" y2="${(20+17*Math.sin(a)).toFixed(1)}"/>`;}
+        return `<svg viewBox="0 0 40 40" width="100%"><circle class="coeur" cx="20" cy="20" r="9" fill="#FBBF24"/><g class="rayons" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" opacity=".85">${r}</g></svg>`;
+         ]]]
+    style:
+      left: 44.29%
+      top: 90.77%
+      width: 6.35%
+      pointer-events: none
+  - type: custom:button-card
+    entity: sensor.solar_power
+    triggers_update:
+    - sensor.solar_power
+    name: anime-eclair
+    show_name: false
+    show_icon: false
+    show_state: false
+    show_label: false
+    tap_action:
+      action: none
+    hold_action:
+      action: none
+    styles:
+      card:
+      - background: none
+      - box-shadow: none
+      - border: none
+      - padding: '0'
+      - border-radius: '0'
+      - overflow: visible
+      grid:
+      - grid-template-areas: '"a"'
+      - grid-template-columns: 1fr
+      - grid-template-rows: 1fr
+      custom_fields:
+        a:
+        - width: 100%
+        - line-height: '0'
+    extra_styles: |2
+
+      @keyframes flash{0%,78%,100%{opacity:0}82%{opacity:1}86%{opacity:.15}91%{opacity:.85}}
+      .flash{animation:flash 4s linear infinite}
+    custom_fields:
+      a: |
+        [[[ const n=(id)=>{const s=states[id];if(!s)return 0;let v=parseFloat(s.state);if(isNaN(v))return 0;return (s.attributes.unit_of_measurement||'')==='kW'?v*1000:v;};
+        if(n('sensor.solar_power')<20) return '<svg viewBox="0 0 1 1" width="100%"></svg>';
+        return `<svg viewBox="0 0 24 24" width="100%"><defs><radialGradient id="rg"><stop offset="0" stop-color="#FDE047" stop-opacity=".9"/><stop offset="1" stop-color="#FDE047" stop-opacity="0"/></radialGradient></defs><circle class="flash" cx="12" cy="12" r="11" fill="url(#rg)"/></svg>`;
+         ]]]
+    style:
+      left: 45.71%
+      top: 80.74%
+      width: 3.81%
+      pointer-events: none
+  - type: custom:button-card
+    entity: weather.forecast_home
+    triggers_update:
+    - weather.forecast_home
+    - weather.forecast_home
+    - sun.sun
+    name: anime-meteo
+    show_name: false
+    show_icon: false
+    show_state: false
+    show_label: false
+    tap_action:
+      action: none
+    hold_action:
+      action: none
+    styles:
+      card:
+      - background: none
+      - box-shadow: none
+      - border: none
+      - padding: '0'
+      - border-radius: '0'
+      - overflow: visible
+      grid:
+      - grid-template-areas: '"a"'
+      - grid-template-columns: 1fr
+      - grid-template-rows: 1fr
+      custom_fields:
+        a:
+        - width: 100%
+        - line-height: '0'
+    extra_styles: |2
+
+      @keyframes tourne{to{transform:rotate(360deg)}}
+      @keyframes derive{0%,100%{transform:translateX(-2px)}50%{transform:translateX(2.5px)}}
+      @keyframes pluie{0%{transform:translateY(0);opacity:0}20%{opacity:1}100%{transform:translateY(9px);opacity:0}}
+      @keyframes neige{0%{transform:translate(0,0);opacity:0}20%{opacity:1}100%{transform:translate(2px,10px);opacity:0}}
+      @keyframes eclair{0%,70%,100%{opacity:0}74%{opacity:1}78%{opacity:.2}82%{opacity:1}}
+      @keyframes brume{0%,100%{transform:translateX(-3px)}50%{transform:translateX(3px)}}
+      @keyframes vent{0%{stroke-dasharray:0 60;opacity:0}30%{opacity:1}100%{stroke-dasharray:60 0;opacity:0}}
+      @keyframes etoile{0%,100%{opacity:.15}50%{opacity:1}}
+      .tourne{animation:tourne 16s linear infinite}
+      .derive{animation:derive 6s ease-in-out infinite}
+      .derive2{animation:derive 8s ease-in-out infinite reverse}
+      .pluie{animation:pluie linear infinite}
+      .neige{animation:neige 2.6s linear infinite}
+      .eclair{animation:eclair 3s linear infinite}
+      .brume{animation:brume 4s ease-in-out infinite}
+      .vent{animation:vent 2.4s ease-out infinite}
+      .etoile{animation:etoile 2.5s ease-in-out infinite}
+    custom_fields:
+      a: |
+        [[[ const n=(id)=>{const s=states[id];if(!s)return 0;let v=parseFloat(s.state);if(isNaN(v))return 0;return (s.attributes.unit_of_measurement||'')==='kW'?v*1000:v;};
+        const w=states['weather.forecast_home'], w2=states['weather.forecast_home'];
+        const m=(w&&!['unavailable','unknown'].includes(w.state))?w:w2;
+        let e=m?m.state:'cloudy';
+        const nuit=(states['sun.sun']||{}).state==='below_horizon';
+        if(nuit&&e==='sunny') e='clear-night';
+        const t=m&&m.attributes.temperature!=null?Math.round(m.attributes.temperature)+'°':'';
+        const nuage=(x,y,s,f)=>`<g transform="translate(${x} ${y}) scale(${s})"><path d="M8 22h26a7 7 0 0 0 0-14a10 10 0 0 0-19-2a8 8 0 0 0-7 16z" fill="url(#${f})" stroke="#94a3b8" stroke-width=".7"/></g>`;
+        const soleil=(x,y,r)=>{let l='';for(let k=0;k<8;k++){const a=k*Math.PI/4;l+=`<line x1="${(x+(r+2)*Math.cos(a)).toFixed(1)}" y1="${(y+(r+2)*Math.sin(a)).toFixed(1)}" x2="${(x+(r+5)*Math.cos(a)).toFixed(1)}" y2="${(y+(r+5)*Math.sin(a)).toFixed(1)}"/>`;}
+         return `<g class="tourne" style="transform-origin:${x}px ${y}px" stroke="#F59E0B" stroke-width="1.6" stroke-linecap="round">${l}</g><circle cx="${x}" cy="${y}" r="${r}" fill="url(#gs)"/>`;};
+        const lune=(x,y)=>`<path d="M${x+3} ${y-8}a8.5 8.5 0 1 0 6 13a7 7 0 0 1-6-13z" fill="#FDE68A" stroke="#F59E0B" stroke-width=".6"/>`+
+         [[x-12,y-6,0],[x+12,y-10,.8],[x+16,y+4,1.6],[x-8,y+8,2.2]].map(([a,b,d])=>`<circle class="etoile" cx="${a}" cy="${b}" r=".9" fill="#FBBF24" style="animation-delay:${d}s"/>`).join('');
+        const pluie=(nb,v)=>{let s='';for(let k=0;k<nb;k++){s+=`<line class="pluie" x1="${41+k*(26/nb)}" y1="30" x2="${39.5+k*(26/nb)}" y2="34" stroke="#3B82F6" stroke-width="1.3" stroke-linecap="round" style="animation-duration:${v}s;animation-delay:${(k*v/nb).toFixed(2)}s"/>`;}return s;};
+        const neige=(nb)=>{let s='';for(let k=0;k<nb;k++){s+=`<circle class="neige" cx="${42+k*(24/nb)}" cy="30" r="1.2" fill="#fff" stroke="#93C5FD" stroke-width=".5" style="animation-delay:${(k*.5).toFixed(1)}s"/>`;}return s;};
+        const eclair=`<path class="eclair" d="M55 27l-4 7h3l-2 6 6-8h-3l2-5z" fill="#FACC15" stroke="#CA8A04" stroke-width=".5"/>`;
+        const brume=[0,1,2].map(k=>`<line class="brume" x1="38" y1="${30+k*4}" x2="70" y2="${30+k*4}" stroke="#94A3B8" stroke-width="1.8" stroke-linecap="round" opacity=".7" style="animation-delay:${k*.6}s"/>`).join('');
+        const vent=[0,1,2].map(k=>`<path class="vent" d="M30 ${14+k*7}h22a4 4 0 1 0-4-4" fill="none" stroke="#64748B" stroke-width="1.4" stroke-linecap="round" style="animation-delay:${k*.4}s"/>`).join('');
+        const N1=nuage(34,3,1,'gn'), N2=(f)=>nuage(36,4,1,f);
+        let ic='';
+        switch(e){
+         case 'sunny': ic=soleil(55,20,8);break;
+         case 'clear-night': ic=lune(55,20);break;
+         case 'partlycloudy': ic=(nuit?lune(48,13):soleil(48,13,6))+`<g class="derive">${N1}</g>`;break;
+         case 'cloudy': ic=`<g class="derive2">${nuage(28,0,.75,'gn')}</g><g class="derive">${N1}</g>`;break;
+         case 'rainy': ic=pluie(5,.9)+`<g class="derive">${N2('gp')}</g>`;break;
+         case 'pouring': ic=pluie(9,.55)+`<g class="derive">${N2('gp')}</g>`;break;
+         case 'snowy': ic=neige(5)+`<g class="derive">${N1}</g>`;break;
+         case 'snowy-rainy': ic=pluie(3,.9)+neige(3)+`<g class="derive">${N1}</g>`;break;
+         case 'hail': ic=neige(6)+`<g class="derive">${N2('gp')}</g>`;break;
+         case 'lightning': ic=eclair+`<g class="derive">${N2('go')}</g>`;break;
+         case 'lightning-rainy': ic=pluie(5,.7)+eclair+`<g class="derive">${N2('go')}</g>`;break;
+         case 'fog': ic=`<g class="derive">${N1}</g>`+brume;break;
+         case 'windy': case 'windy-variant': ic=vent+(e==='windy-variant'?`<g class="derive">${nuage(38,0,.7,'gn')}</g>`:'');break;
+         default: ic=`<g class="derive">${N1}</g>`;
+        }
+        return `<svg viewBox="0 0 80 44" width="100%" overflow="visible"><defs>
+        <linearGradient id="gn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#cbd5e1"/></linearGradient>
+        <linearGradient id="gp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e2e8f0"/><stop offset="1" stop-color="#94a3b8"/></linearGradient>
+        <linearGradient id="go" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#94a3b8"/><stop offset="1" stop-color="#475569"/></linearGradient>
+        <radialGradient id="gs"><stop offset="0" stop-color="#FDE047"/><stop offset="1" stop-color="#F59E0B"/></radialGradient></defs>
+        ${ic}<text x="27" y="27" text-anchor="end" font-family="Roboto,Arial,sans-serif" font-size="11" font-weight="700" fill="#334155">${t}</text></svg>`;
+         ]]]
+    style:
+      left: 23.97%
+      top: 84.70%
+      width: 12.70%
+      pointer-events: none
+  - type: custom:button-card
+    entity: sensor.solar_power
+    triggers_update:
+    - sensor.solar_power
+    name: anime-pic
+    show_name: false
+    show_icon: false
+    show_state: false
+    show_label: false
+    tap_action:
+      action: none
+    hold_action:
+      action: none
+    styles:
+      card:
+      - background: none
+      - box-shadow: none
+      - border: none
+      - padding: '0'
+      - border-radius: '0'
+      - overflow: visible
+      grid:
+      - grid-template-areas: '"a"'
+      - grid-template-columns: 1fr
+      - grid-template-rows: 1fr
+      custom_fields:
+        a:
+        - width: 100%
+        - line-height: '0'
+    extra_styles: |2
+
+      @keyframes onde{0%{transform:scale(.7);opacity:.9}100%{transform:scale(2.8);opacity:0}}
+      .onde{animation:onde 2.2s ease-out infinite;transform-origin:13px 13px}
+    custom_fields:
+      a: |
+        [[[ const n=(id)=>{const s=states[id];if(!s)return 0;let v=parseFloat(s.state);if(isNaN(v))return 0;return (s.attributes.unit_of_measurement||'')==='kW'?v*1000:v;};
+        return `<svg viewBox="0 0 26 26" width="100%"><circle class="onde" cx="13" cy="13" r="4" fill="none" stroke="#F59E0B" stroke-width="1.4"/><circle class="onde" cx="13" cy="13" r="4" fill="none" stroke="#F59E0B" stroke-width="1.4" style="animation-delay:1.1s"/></svg>`;
+         ]]]
+    style:
+      left: 30.63%
+      top: 81.53%
+      width: 4.13%
+      pointer-events: none
+  - type: state-label
+    entity: sensor.solar_power
+    style:
+      top: 14.5%
+      transform: translate(0, -50%)
+      font-size: 42px
+      font-weight: '700'
+      color: '#1F2937'
+      white-space: nowrap
+      left: 15.4%
+  - type: state-label
+    entity: sensor.solar_energy_today
+    prefix: 'Aujourd''hui : '
+    style:
+      top: 21.5%
+      transform: translate(0, -50%)
+      font-size: 17px
+      color: '#4B5563'
+      white-space: nowrap
+      left: 15.4%
+  - type: state-label
+    entity: sensor.house_power
+    style:
+      top: 14.5%
+      transform: translate(0, -50%)
+      font-size: 42px
+      font-weight: '700'
+      color: '#1F2937'
+      white-space: nowrap
+      left: 55.2%
+  - type: state-label
+    entity: sensor.consommation_sous_titre
+    style:
+      top: 21.5%
+      transform: translate(0, -50%)
+      font-size: 17px
+      color: '#166534'
+      white-space: nowrap
+      left: 55.2%
+      font-weight: '600'
+  - type: state-label
+    entity: sensor.eau_chaude_disponible
+    style:
+      top: 36.4%
+      transform: translate(0, -50%)
+      font-size: 42px
+      font-weight: '700'
+      color: '#431407'
+      white-space: nowrap
+      left: 7.3%
+  - type: state-label
+    entity: sensor.water_heater_temperature
+    prefix: 'Ballon de 300 L à '
+    style:
+      top: 43.5%
+      transform: translate(0, -50%)
+      font-size: 17px
+      color: '#7C2D12'
+      white-space: nowrap
+      left: 7.3%
+  - type: state-label
+    entity: sensor.douches_restantes
+    style:
+      top: 39.6%
+      transform: translate(0, -50%)
+      font-size: 42px
+      font-weight: '700'
+      color: '#1F2937'
+      white-space: nowrap
+      left: 55.2%
+  - type: state-label
+    entity: sensor.tempo_texte_du_jour
+    style:
+      top: 64.4%
+      transform: translate(0, -50%)
+      font-size: 34px
+      font-weight: '700'
+      color: '#1E3A8A'
+      white-space: nowrap
+      left: 5.1%
+  - type: state-label
+    entity: sensor.tempo_texte_demain
+    style:
+      top: 64.4%
+      transform: translate(0, -50%)
+      font-size: 34px
+      font-weight: '700'
+      color: '#1E3A8A'
+      white-space: nowrap
+      left: 55.2%
+  - type: state-label
+    entity: sensor.pic_de_production_du_jour
+    attribute: heure
+    prefix: 'à '
+    style:
+      top: 85%
+      transform: translate(0, -50%)
+      font-size: 17px
+      color: '#4B5563'
+      white-space: nowrap
+      left: 2%
+  - type: state-label
+    entity: sensor.pic_de_production_du_jour
+    style:
+      top: 92%
+      transform: translate(0, -50%)
+      font-size: 42px
+      font-weight: '700'
+      color: '#1F2937'
+      white-space: nowrap
+      left: 2%
+  - type: state-label
+    entity: sensor.rte_tempo_cycle_jours_restants_bleu
+    prefix: '● '
+    style:
+      top: 86.8%
+      font-size: 24px
+      font-weight: '700'
+      white-space: nowrap
+      left: 75%
+      color: '#1D4ED8'
+  - type: state-label
+    entity: sensor.rte_tempo_cycle_jours_restants_blanc
+    prefix: '○ '
+    style:
+      top: 86.8%
+      font-size: 24px
+      font-weight: '700'
+      white-space: nowrap
+      left: 84.5%
+      color: '#4B5563'
+  - type: state-label
+    entity: sensor.rte_tempo_cycle_jours_restants_rouge
+    prefix: '● '
+    style:
+      top: 86.8%
+      font-size: 24px
+      font-weight: '700'
+      white-space: nowrap
+      left: 94%
+      color: '#B91C1C'

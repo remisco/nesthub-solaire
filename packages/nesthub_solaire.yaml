@@ -1,0 +1,76 @@
+# Capteurs calculés utilisés par la vue « Solaire ».
+# À placer dans config/packages/ (voir README) puis remplacer les entités sources par les vôtres :
+#   sensor.solar_power               puissance produite par les panneaux (W)
+#   sensor.house_power               puissance consommée par la maison (W)
+#   sensor.grid_import_power         puissance tirée du réseau (W, 0 si aucune)
+#   sensor.water_heater_temperature  température du ballon d'eau chaude (°C)
+#   sensor.rte_tempo_couleur_actuelle / sensor.rte_tempo_prochaine_couleur  intégration RTE Tempo (HACS)
+
+template:
+  - sensor:
+      # Litres d'eau à 38 °C disponibles dans le ballon (mélange avec l'eau froide)
+      - name: "Eau chaude disponible"
+        unique_id: nesthub_eau_chaude_disponible
+        unit_of_measurement: "L"
+        icon: mdi:water-boiler
+        state: >
+          {% set volume = 300 %}   {# capacité du ballon en litres #}
+          {% set t_douche = 38 %}  {# température d'une douche #}
+          {% set t_froid = 12 %}   {# température de l'eau froide du réseau #}
+          {% set t = states('sensor.water_heater_temperature') | float(0) %}
+          {{ [volume * (t - t_douche) / (t_douche - t_froid), 0] | max | int }}
+
+      # Nombre de douches de 40 L à 38 °C
+      - name: "Douches restantes"
+        unique_id: nesthub_douches_restantes
+        icon: mdi:shower-head
+        state: >
+          {{ (states('sensor.eau_chaude_disponible') | float(0) / 40) | round(0, 'floor') | int }}
+
+      # Textes Tempo affichés en gros (le Nest Hub n'affiche pas les éléments conditionnels)
+      - name: "Tempo texte du jour"
+        unique_id: nesthub_tempo_texte_aujourdhui
+        state: >
+          {% set c = states('sensor.rte_tempo_couleur_actuelle') %}
+          {{ {'Bleu': 'Bleu · tarif réduit', 'Blanc': 'Blanc · tarif moyen',
+              'Rouge': 'Rouge · tarif élevé'}.get(c, 'Inconnu') }}
+
+      - name: "Tempo texte demain"
+        unique_id: nesthub_tempo_texte_demain
+        state: >
+          {% set c = states('sensor.rte_tempo_prochaine_couleur') %}
+          {{ {'Bleu': 'Bleu · tarif réduit', 'Blanc': 'Blanc · tarif moyen',
+              'Rouge': 'Rouge · tarif élevé'}.get(c, 'Pas encore publié') }}
+
+      # Sous-titre de la consommation : surplus solaire ou puissance tirée du réseau
+      - name: "Consommation sous-titre"
+        unique_id: nesthub_consommation_sous_titre
+        state: >
+          {% set imp = states('sensor.grid_import_power') | float(0) %}
+          {% set surplus = states('sensor.solar_power') | float(0) - states('sensor.house_power') | float(0) %}
+          {% if imp < 50 %}100 % solaire · surplus {{ [surplus, 0] | max | round(0) | int }} W
+          {% else %}Réseau : {{ imp | round(0) | int }} W{% endif %}
+
+  # Pic de production du jour, avec l'heure du pic ; remis à zéro à minuit
+  - trigger:
+      - platform: state
+        entity_id: sensor.solar_power
+      - platform: time
+        at: "00:00:00"
+    sensor:
+      - name: "Pic de production du jour"
+        unique_id: nesthub_pic_production_jour
+        unit_of_measurement: "W"
+        device_class: power
+        state: >
+          {% set p = states('sensor.solar_power') | float(0) %}
+          {% set ancien = this.state | float(0) if this.state not in ['unknown', 'unavailable'] else 0 %}
+          {% if trigger.platform == 'time' %}0
+          {% else %}{{ [p, ancien] | max | round(0) }}{% endif %}
+        attributes:
+          heure: >
+            {% set p = states('sensor.solar_power') | float(0) %}
+            {% set ancien = this.state | float(0) if this.state not in ['unknown', 'unavailable'] else 0 %}
+            {% if trigger.platform == 'time' %}--:--
+            {% elif p > ancien %}{{ now().strftime('%H:%M') }}
+            {% else %}{{ this.attributes.heure | default('--:--') }}{% endif %}

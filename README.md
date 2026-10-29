@@ -1,42 +1,48 @@
-# Nest Hub Solaire
+# Nest Hub Solaire — Home Assistant solar dashboard for Google Nest Hub
 
-[![Ouvrir dans HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=remisco&repository=nesthub-solaire&category=plugin)
+**English** · [Français](README.fr.md)
 
-Carte **Home Assistant** plein écran pour **Google Nest Hub** : production solaire, consommation, eau chaude, douches restantes, couleurs **EDF Tempo** et **météo en temps réel**, sur une image de fond illustrée animée en HTML/SVG.
+[![Open in HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=remisco&repository=nesthub-solaire&category=plugin)
+[![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://hacs.xyz/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-![Aperçu de la carte](docs/apercu.png)
+A full-screen, animated **Home Assistant Lovelace card** designed for the **Google Nest Hub** (1024 × 600). It shows **solar production**, **home power consumption**, **hot water** left in the tank, **showers remaining**, **EDF Tempo** colours and the **live weather**, drawn over an illustrated background animated in HTML/SVG.
 
-*Aperçu avec des valeurs d'exemple.*
+Install it in one click with **HACS**, then cast it permanently to your Nest Hub with a ready-made automation.
 
-## Ce qu'elle affiche
+![Home Assistant solar dashboard on a Google Nest Hub: solar production, consumption, hot water, EDF Tempo and weather](docs/apercu.png)
 
-| Zone | Valeurs | Animation |
+*Preview with sample values. The card's labels are in French.*
+
+## Features
+
+| Area | Values | Animation |
 |---|---|---|
-| Production | Puissance instantanée, énergie du jour | Reflet de lumière et étincelles sur les panneaux (vitesse selon la production), voile sombre la nuit, voyant de l'onduleur, flux d'énergie vers la maison |
-| Consommation | Puissance, « 100 % solaire · surplus X W » ou « Réseau : X W » | Arcs lumineux qui tournent (vitesse selon la consommation), verts en autoconsommation, orange sur le réseau |
-| Eau chaude | Litres à 38 °C disponibles, température du ballon | Niveau d'eau qui ondule, couleur selon la température, bulles, halo du thermomètre |
-| Douches restantes | Nombre de douches | Une goutte qui tombe par douche restante |
-| Tempo aujourd'hui / demain | Couleur et tarif | Texte et icône calendrier à la couleur du jour, avec un halo |
-| Pic de production | Valeur et heure du pic du jour (lu dans l'historique) | Soleil qui rayonne, éclair qui scintille, onde sur le sommet de la courbe |
-| Météo | Temps actuel et température | Soleil, lune et étoiles, nuages qui dérivent, pluie, averse, neige, orage, brouillard, vent |
-| Jours Tempo restants | Bleu / Blanc / Rouge | — |
+| Solar production | Live power, energy produced today | Light sweep and sparkles on the panels (speed follows production), dimmed at night, inverter LED, energy flow to the house |
+| Consumption | Power, "100 % solar · surplus X W" or "Grid: X W" | Rotating light arcs (speed follows consumption), green when self-consuming, orange on grid power |
+| Hot water | Litres of 38 °C water available, tank temperature | Rippling water level coloured by temperature, bubbles, thermometer glow |
+| Showers remaining | Number of showers | One falling drop per remaining shower |
+| EDF Tempo today / tomorrow | Colour and tariff | Text and calendar icon in the day's colour, with a glow |
+| Daily production peak | Peak value and time (read from history) | Radiating sun, flickering lightning bolt, wave on the curve's summit |
+| Weather | Current conditions and temperature | Sun, moon and stars, drifting clouds, rain, downpour, snow, thunderstorm, fog, wind |
+| EDF Tempo days left | Blue / White / Red | — |
 
-Tout est calculé dans la carte : **aucun capteur template, aucune autre carte personnalisée, aucune image à copier**.
+Everything is computed inside the card: **no template sensors, no other custom cards and no images to copy**. It works with any solar inverter integrated in Home Assistant (Enphase Envoy, SolarEdge, Fronius, Huawei, Shelly EM…).
 
-## Installation avec HACS (recommandé)
+## Installation with HACS (recommended)
 
-1. Cliquez sur le bouton **Ouvrir dans HACS** ci-dessus, ou dans HACS : **⋮ → Dépôts personnalisés**, ajoutez `https://github.com/remisco/nesthub-solaire` avec la catégorie **Tableau de bord** (*Dashboard*).
-2. Cliquez sur **Télécharger**, puis rechargez la page du navigateur.
+1. Click the **Open in HACS** button above, or in HACS go to **⋮ → Custom repositories** and add `https://github.com/remisco/nesthub-solaire` with the **Dashboard** category.
+2. Click **Download**, then reload your browser.
 
-HACS ajoute automatiquement la ressource `/hacsfiles/nesthub-solaire/nesthub-solaire-card.js`.
+HACS adds the `/hacsfiles/nesthub-solaire/nesthub-solaire-card.js` resource automatically.
 
-### Installation manuelle de la carte
+### Manual installation
 
-Copiez [`dist/nesthub-solaire-card.js`](dist/nesthub-solaire-card.js) dans `config/www/`, puis ajoutez la ressource `/local/nesthub-solaire-card.js` (type *Module JavaScript*) dans **Paramètres → Tableaux de bord → ⋮ → Ressources**.
+Copy [`dist/nesthub-solaire-card.js`](dist/nesthub-solaire-card.js) to `config/www/`, then add the resource `/local/nesthub-solaire-card.js` (type *JavaScript module*) under **Settings → Dashboards → ⋮ → Resources**.
 
 ## Configuration
 
-Créez une vue de type **Panneau** (une seule carte en plein écran) avec le chemin `solaire`, et ajoutez-y la carte :
+Create a view of type **Panel** (a single full-screen card) with the path `solaire`, and add the card:
 
 ```yaml
 views:
@@ -53,61 +59,61 @@ views:
         meteo: weather.forecast_home
 ```
 
-Remplacez les entités par les vôtres.
+Replace the entities with your own. Option names are in French.
 
 ### Options
 
-| Option | Obligatoire | Par défaut | Description |
+| Option | Required | Default | Description |
 |---|---|---|---|
-| `production` | oui | — | Puissance produite par les panneaux (W ou kW) |
-| `consommation` | oui | — | Puissance consommée par la maison (W ou kW) |
-| `energie_jour` | non | — | Énergie produite aujourd'hui |
-| `import_reseau` | non | consommation − production | Puissance tirée du réseau |
-| `seuil_import` | non | `50` | En dessous de cette puissance importée (W), la maison est considérée « 100 % solaire » |
-| `temperature_ballon` | non | — | Température du ballon d'eau chaude (°C) |
-| `eau_chaude` | non | calculée | Capteur de litres d'eau chaude disponibles, si vous en avez déjà un |
-| `volume_ballon` | non | `300` | Capacité du ballon (L) |
-| `temperature_douche` | non | `38` | Température d'une douche (°C) |
-| `temperature_eau_froide` | non | `12` | Température de l'eau froide du réseau (°C) |
-| `litres_par_douche` | non | `60` | Litres d'eau à 38 °C par douche (environ 8 minutes avec un pommeau classique) |
-| `meteo` | non | `weather.forecast_home` | Entité météo |
-| `soleil` | non | `sun.sun` | Pour afficher la lune la nuit |
-| `tempo_aujourdhui` | non | `sensor.rte_tempo_couleur_actuelle` | Couleur Tempo du jour |
-| `tempo_demain` | non | `sensor.rte_tempo_prochaine_couleur` | Couleur Tempo du lendemain |
-| `jours_bleu`, `jours_blanc`, `jours_rouge` | non | `sensor.rte_tempo_cycle_jours_restants_*` | Jours Tempo restants |
+| `production` | yes | — | Power produced by the solar panels (W or kW) |
+| `consommation` | yes | — | Power consumed by the house (W or kW) |
+| `energie_jour` | no | — | Energy produced today |
+| `import_reseau` | no | consumption − production | Power drawn from the grid |
+| `seuil_import` | no | `50` | Below this imported power (W), the house is shown as "100 % solar" |
+| `temperature_ballon` | no | — | Hot water tank temperature (°C) |
+| `eau_chaude` | no | computed | Your own hot water litres sensor, if you already have one |
+| `volume_ballon` | no | `300` | Tank capacity (L) |
+| `temperature_douche` | no | `38` | Shower temperature (°C) |
+| `temperature_eau_froide` | no | `12` | Mains cold water temperature (°C) |
+| `litres_par_douche` | no | `60` | Litres of 38 °C water per shower (about 8 minutes with a standard shower head) |
+| `meteo` | no | `weather.forecast_home` | Weather entity |
+| `soleil` | no | `sun.sun` | Used to show the moon at night |
+| `tempo_aujourdhui` | no | `sensor.rte_tempo_couleur_actuelle` | Today's Tempo colour |
+| `tempo_demain` | no | `sensor.rte_tempo_prochaine_couleur` | Tomorrow's Tempo colour |
+| `jours_bleu`, `jours_blanc`, `jours_rouge` | no | `sensor.rte_tempo_cycle_jours_restants_*` | Tempo days left |
 
-Les entités Tempo par défaut sont celles de l'intégration [RTE Tempo](https://github.com/hekmon/rtetempo) (HACS).
+The default Tempo entities come from the [RTE Tempo](https://github.com/hekmon/rtetempo) integration (HACS). Tempo is a French electricity tariff; outside France, just leave these entities out.
 
-**Calcul de l'eau chaude** : litres à 38 °C = `volume × (T_ballon − 38) / (38 − T_eau_froide)`, puis douches = litres ÷ 60, arrondi à l'inférieur. C'est de l'eau mitigée (eau du ballon mélangée à l'eau froide) : à 70 °C, un ballon de 300 L fournit environ 370 L à 38 °C, soit 6 douches.
+**Hot water calculation**: litres at 38 °C = `volume × (T_tank − 38) / (38 − T_cold_water)`, then showers = litres ÷ 60, rounded down. This is mixed water (tank water blended with cold water): at 70 °C, a 300 L tank delivers about 370 L at 38 °C, i.e. 6 showers.
 
-## Affichage sur le Nest Hub
+## Showing it on the Nest Hub
 
-### Prérequis
+### Requirements
 
-- Le Nest Hub doit être ajouté à Home Assistant via l'intégration **Google Cast**.
-- Home Assistant doit être accessible en **HTTPS avec un certificat valide** : le Nest Hub refuse les pages en HTTP. Au choix :
-  - Home Assistant Cloud (Nabu Casa) ;
-  - l'add-on **Duck DNS** avec Let's Encrypt (gratuit), puis renseigner l'URL `https://…` dans *Paramètres → Système → Réseau* (URL interne **et** externe).
+- The Nest Hub must be added to Home Assistant through the **Google Cast** integration.
+- Home Assistant must be reachable over **HTTPS with a valid certificate**: the Nest Hub refuses plain HTTP pages. Either:
+  - Home Assistant Cloud (Nabu Casa);
+  - the **Duck DNS** add-on with Let's Encrypt (free), then set the `https://…` URL in *Settings → System → Network* (both internal **and** external URL).
 
-### Affichage permanent
+### Always-on display
 
-Créez une automatisation, passez en mode YAML et collez [`automations/nesthub_affichage_permanent.yaml`](automations/nesthub_affichage_permanent.yaml), en remplaçant `media_player.nest_hub` par votre écran.
+Create an automation, switch to YAML mode and paste [`automations/nesthub_affichage_permanent.yaml`](automations/nesthub_affichage_permanent.yaml), replacing `media_player.nest_hub` with your display.
 
-Toutes les minutes, elle relance la vue si l'écran est au repos (cadre photo, horloge, éteint). Elle n'interrompt jamais une vidéo ou une autre application.
+Every minute, it casts the view again if the screen is idle (photo frame, clock or off). It never interrupts a video or another app.
 
-Pour tester tout de suite : *Outils de développement → Actions → `cast.show_lovelace_view`* avec votre écran, `dashboard_path: lovelace` et `view_path: solaire`.
+To try it right away: *Developer tools → Actions → `cast.show_lovelace_view`* with your display, `dashboard_path: lovelace` and `view_path: solaire`.
 
-## Bon à savoir
+## Good to know
 
-- Le Nest Hub ne transmet pas le toucher à l'affichage Home Assistant : la carte est faite pour être regardée.
-- Le Nest Hub coupe l'affichage Cast au bout d'une dizaine de minutes ; l'automatisation le relance dans la minute suivante.
-- La carte garde le format 1024 × 600 du Nest Hub et s'adapte à la largeur disponible sur les autres écrans.
-- Pour accéder à Home Assistant depuis l'extérieur sans ouvrir de port, l'add-on **Tailscale** fonctionne très bien en complément.
+- The Nest Hub does not pass touch input to the Home Assistant cast: the card is made to be looked at.
+- The Nest Hub stops the cast after about ten minutes; the automation restarts it within a minute.
+- The card keeps the Nest Hub's 1024 × 600 layout and scales to the available width on other screens.
+- To reach Home Assistant from outside without opening a port, the **Tailscale** add-on works very well alongside it.
 
-## Version YAML sans carte personnalisée
+## YAML version without a custom card
 
-Le dossier [`installation-manuelle/`](installation-manuelle/) contient l'ancienne version entièrement en YAML (vue picture-elements avec button-card et card-mod, capteurs template, thème et image de fond), pour ceux qui préfèrent tout modifier à la main.
+The [`installation-manuelle/`](installation-manuelle/) folder contains the earlier all-YAML version (a picture-elements view with button-card and card-mod, template sensors, theme and background image), for those who prefer to edit everything by hand.
 
-## Licence
+## License
 
 [MIT](LICENSE)

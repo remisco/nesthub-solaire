@@ -69,7 +69,7 @@ Remplacez les entités par les vôtres.
 | `volume_ballon` | non | `300` | Capacité du ballon (L) |
 | `temperature_douche` | non | `38` | Température d'une douche (°C) |
 | `temperature_eau_froide` | non | `12` | Température de l'eau froide du réseau (°C) |
-| `litres_par_douche` | non | `40` | Litres d'eau à 38 °C par douche |
+| `litres_par_douche` | non | `60` | Litres d'eau à 38 °C par douche (environ 8 minutes avec un pommeau classique) |
 | `meteo` | non | `weather.forecast_home` | Entité météo |
 | `soleil` | non | `sun.sun` | Pour afficher la lune la nuit |
 | `tempo_aujourdhui` | non | `sensor.rte_tempo_couleur_actuelle` | Couleur Tempo du jour |
@@ -78,7 +78,7 @@ Remplacez les entités par les vôtres.
 
 Les entités Tempo par défaut sont celles de l'intégration [RTE Tempo](https://github.com/hekmon/rtetempo) (HACS).
 
-**Calcul de l'eau chaude** : litres à 38 °C = `volume × (T_ballon − 38) / (38 − T_eau_froide)`, puis douches = litres ÷ 40.
+**Calcul de l'eau chaude** : litres à 38 °C = `volume × (T_ballon − 38) / (38 − T_eau_froide)`, puis douches = litres ÷ 60, arrondi à l'inférieur. C'est de l'eau mitigée (eau du ballon mélangée à l'eau froide) : à 70 °C, un ballon de 300 L fournit environ 370 L à 38 °C, soit 6 douches.
 
 ## Affichage sur le Nest Hub
 

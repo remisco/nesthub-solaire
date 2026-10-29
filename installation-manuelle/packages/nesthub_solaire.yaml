@@ -20,12 +20,13 @@ template:
           {% set t = states('sensor.water_heater_temperature') | float(0) %}
           {{ [volume * (t - t_douche) / (t_douche - t_froid), 0] | max | int }}
 
-      # Nombre de douches de 40 L à 38 °C
+      # Nombre de douches de 60 L à 38 °C (environ 8 minutes avec un pommeau classique)
       - name: "Douches restantes"
         unique_id: nesthub_douches_restantes
         icon: mdi:shower-head
         state: >
-          {{ (states('sensor.eau_chaude_disponible') | float(0) / 40) | round(0, 'floor') | int }}
+          {% set litres_par_douche = 60 %}
+          {{ (states('sensor.eau_chaude_disponible') | float(0) / litres_par_douche) | round(0, 'floor') | int }}
 
       # Textes Tempo affichés en gros (le Nest Hub n'affiche pas les éléments conditionnels)
       - name: "Tempo texte du jour"
